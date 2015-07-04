@@ -59,7 +59,7 @@ class mihasher {
 
  public:
 	
-    mihasher();
+    mihasher(){};
 
     ~mihasher();
 
