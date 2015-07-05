@@ -24,6 +24,11 @@ class MihasherPython : public mihasher {
       return; 
   }
 
+  void load_bin_codes_py(const char *filename, const char *varStr) {
+    this->load_bin_codes(filename, varStr);
+    return;
+  }
+
 };
 
 
@@ -31,5 +36,7 @@ BOOST_PYTHON_MODULE(libmihmodule)
 {
   class_<MihasherPython> ("MihasherPython")
       .def(init<int, int>())
-      .def("setK", &MihasherPython::setK_py);
+      .def("setK", &MihasherPython::setK_py)
+      .def("load_bin_codes", &MihasherPython::load_bin_codes_py)
+      ;
 }

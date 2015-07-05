@@ -14,6 +14,10 @@
 #include "sparse_hashtable.h"
 #include "bitarray.h"
 
+#include "mihasher.h"
+#include "result.h"
+#include "resulth5.h"
+
 #define STAT_DIM 6		/* Dimensionality of stats, it has STAT_DIM many fields */
 
 struct qstat {
@@ -67,11 +71,28 @@ class mihasher {
 
     void setK(int K);
 
+    void build_index(const char* infile, const char* outfile);
+
+    void query();
+
+
     void populate(UINT8 *codes, UINT32 N, int dim1codes);
 
     void batchquery (UINT32 *results, UINT32 *numres, qstat *stats, UINT8 * q, UINT32 numq, int dim1queries);
    	
- private:
+    void saveVarRef(hobj_ref_t *ref, hid_t file, int i, int dim1, int dim2, 
+        const char *varStrMain, const char *varStr, void *var, const char *type);
+
+    void saveRes(const char *filename, const char *varStr, const result_t *result, int n, int overwrite /* = 1 */);
+
+
+    void load_bin_codes(const char *filename, const char *varStr) ;
+
+ protected:
+    void load_double_matrix(const char *filename, const char *varStr, UINT8 *matrix, int *nrow, int *ncol);
+    void process_mem_usage(double *vm_usage, double *resident_set);
+
+
     void query(UINT32 *results, UINT32* numres, qstat *stats, UINT8 *q, UINT64 * chunks, UINT32 * res);
 };
 
