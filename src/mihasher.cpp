@@ -1,6 +1,6 @@
 #include <algorithm>
-#include "mihasher.h"
 #include "myhdf5.h"
+#include "mihasher.h"
 #include <hdf5.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -443,7 +443,7 @@ void mihasher::load_bin_codes(const char *filename, const char *varStr) {
     hsize_t count[2];
     N = dims[0];
     count[0] = N;
-	B = dims[1];
+    B = dims[1];
     count[1] = B;
     status = H5Sselect_hyperslab(space, H5S_SELECT_SET, start, NULL, count, NULL);
     printf("status %d\n", status);
@@ -453,6 +453,15 @@ void mihasher::load_bin_codes(const char *filename, const char *varStr) {
     printf("total size is %d\n", total_size);
     fflush(stdout);
     codes = (UINT8*)malloc((size_t)N * (B/8) * sizeof(UINT8));
+    if (codes == NULL) {
+       printf("can not allocate memory for %d X %d \n", N, B);
+       fflush(stdout);
+       return;
+    }  else {
+       printf("memory allocaed\n");
+      fflush(stdout);
+   }
+
  
     /*
      * Read the data using the default properties.
@@ -550,6 +559,7 @@ void mihasher::process_mem_usage(double *vm_usage, double *resident_set)
 
 
 void mihasher::saveVarRef(hobj_ref_t *ref, hid_t file, int i, int dim1, int dim2, const char *varStrMain, const char *varStr, void *var, const char *type) {
+    /*
     hsize_t dims[2] = {dim1, dim2};
     hid_t  space = H5Screate_simple(2, dims, NULL);
     herr_t status;
@@ -571,6 +581,7 @@ void mihasher::saveVarRef(hobj_ref_t *ref, hid_t file, int i, int dim1, int dim2
     status = H5Dclose(dset);
     
     status = H5Rcreate(ref, file, str, H5R_OBJECT, -1);
+    */
 }
 
 void mihasher::saveRes(const char *filename, const char *varStr, const result_t *result, int n, int overwrite /* = 1 */) {  
@@ -583,19 +594,19 @@ void mihasher::saveRes(const char *filename, const char *varStr, const result_t 
 	overwrite = 1;
     }
 
-    /* Open file and dataset using the default properties */
+    // Open file and dataset using the default properties 
     if (overwrite == 1) {
 	printf("Creating the file %s\n", filename);
     	file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-	/* Creating a group for references */
+	// Creating a group for references 
 	group = H5Gcreate(file, "/refs", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	status = H5Gclose(group);
     } else if (overwrite == 2) {
     	file = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
     }
 
-    /* Creating the result hdf5 compound type */
+    // Creating the result hdf5 compound type 0
     hid_t restype = H5Tcreate(H5T_COMPOUND, sizeof(resulth5_t));
     status = H5Tinsert (restype, "wt",    HOFFSET(resulth5_t, wt),      H5T_NATIVE_DOUBLE);
     status = H5Tinsert (restype, "cput",  HOFFSET(resulth5_t, cput),    H5T_NATIVE_DOUBLE);
